@@ -1,0 +1,178 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Scratch Pad
+meta:
+  id: wrk_scratchpad
+  created: 1772033859271
+  modified: 1772033859271
+  description: ""
+collection:
+  - url: http://127.0.0.1:1111/api/add
+    name: Add
+    meta:
+      id: req_e7e6f6a9ac2c40409cec587163e725a3
+      created: 1772039730108
+      modified: 1772702887698
+      isPrivate: false
+      description: ""
+      sortKey: -1772039730108
+    method: POST
+    body:
+      mimeType: multipart/form-data
+      params:
+        - name: name
+          value: осмысленное
+          description: ""
+          disabled: false
+        - name: price
+          value: "23342"
+          description: ""
+          disabled: false
+        - name: definition
+          value: правильное описание
+          description: ""
+          disabled: false
+        - name: image
+          value: ""
+          description: ""
+          disabled: true
+          fileName: /run/user/1000/doc/3c1b839/logo-consent.webp
+          type: file
+    headers:
+      - name: Content-Type
+        value: multipart/form-data
+      - name: User-Agent
+        value: insomnia/12.3.1
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://127.0.0.1:1111/api/search
+    name: Search
+    meta:
+      id: req_abf73512a8b148b088ee031c5a865d09
+      created: 1772040416461
+      modified: 1772703200551
+      isPrivate: false
+      description: ""
+      sortKey: -1772040416462
+    method: GET
+    parameters:
+      - name: name
+        value: ЛНР
+        description: ""
+        disabled: false
+    headers:
+      - name: User-Agent
+        value: insomnia/12.3.1
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://127.0.0.1:1111/api/edit
+    name: Edit
+    meta:
+      id: req_6b170c5eb0144212bd3b6ba81c95c4e2
+      created: 1772042290085
+      modified: 1772703134394
+      isPrivate: false
+      description: ""
+      sortKey: -1772042290085
+    method: PATCH
+    body:
+      mimeType: multipart/form-data
+      params:
+        - name: id
+          value: Do_AbgRET8DTGlMyB3ChHw
+          description: ""
+          disabled: false
+        - name: definition
+          value: более осмысленное
+          description: ""
+          disabled: false
+        - name: price
+          value: "213113"
+          description: ""
+          disabled: false
+        - name: image
+          value: ""
+          description: ""
+          disabled: true
+          fileName: /run/user/1000/doc/cc6b9a6e/vlcsnap-2025-03-17-13h04m38s289.png
+          type: file
+        - name: name
+          value: Пункт сбора
+          description: ""
+          disabled: false
+    headers:
+      - name: Content-Type
+        value: multipart/form-data
+      - name: User-Agent
+        value: insomnia/12.3.1
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://127.0.0.1:1111/api/remove
+    name: Delete
+    meta:
+      id: req_bfe7ea78e7394100954704c1ba10927d
+      created: 1772042623757
+      modified: 1772703215387
+      isPrivate: false
+      description: ""
+      sortKey: -1772042623757
+    method: DELETE
+    body:
+      mimeType: multipart/form-data
+      params:
+        - name: id
+          value: ропрпаропроп
+          description: ""
+          disabled: false
+    headers:
+      - name: Content-Type
+        value: multipart/form-data
+      - name: User-Agent
+        value: insomnia/12.3.1
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1772033880421
+    modified: 1772033880421
+environments:
+  name: Base Environment
+  meta:
+    id: env_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1772033880415
+    modified: 1772033880415
+    isPrivate: false
