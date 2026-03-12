@@ -7,12 +7,13 @@ import (
 )
 
 type Databaser interface {
-	CreateDBConnection() (*gorm.DB, error)
+	CreateDBConnection(db_path string) error
 	AddProduct(product *entity.Product) error
 	DeleteProduct(id string) error
 	SearchProduct(name string) ([]entity.Product, error)
 	UpdateProduct(product *entity.Product) error
 	GetProductByID(id string) (entity.Product, error)
+	DropDBAndReinsert(prds []entity.Product) error
 }
 
 type Database struct {

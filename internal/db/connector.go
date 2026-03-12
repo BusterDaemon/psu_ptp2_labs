@@ -2,21 +2,20 @@ package db
 
 import (
 	"product_api/entity"
+	"sync"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-func (d *Database) CreateDBConnection() error {
-	db, err := gorm.Open(sqlite.Open("store.db"), &gorm.Config{})
+func (d *Database) CreateDBConnection(db_path string) error {
+	db, err := gorm.Open(sqlite.Open(db_path), &gorm.Config{})
 	if err != nil {
 		return err
 	}
 
 	db = db.Debug()
-
 	db.AutoMigrate(&entity.Product{})
-
 	d.connection = db
 
 	return nil
@@ -79,4 +78,25 @@ func (d Database) GetProductByID(id string) (entity.Product, error) {
 	}
 
 	return product, nil
+}
+
+func (d Database) DropDBAndReinsert(prds []entity.Product) error {
+	var mt sync.Mutex
+
+	mt.Lock()
+	err := d.connection.Migrator().DropTable(&entity.Product{})
+	if err != nil {
+		return err
+	}
+	err = d.connection.AutoMigrate(&entity.Product{})
+	if err != nil {
+		return err
+	}
+
+	for _, v := range prds {
+		d.connection.Create(v)
+	}
+	mt.Unlock()
+
+	return nil
 }
