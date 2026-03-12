@@ -23,15 +23,21 @@ type Servicer interface {
 	Search(c fiber.Ctx) error
 	InitFromFile() error
 	WriteToFile() error
+	AddGetController(path string, handler func(c fiber.Ctx) error)
+	AddPostController(path string, handler func(c fiber.Ctx) error)
+	AddPatchController(path string, handler func(c fiber.Ctx) error)
+	AddDeleteController(path string, handler func(c fiber.Ctx) error)
+	GetMyApp() *fiber.App
 }
 
 type APIService struct {
 	data     db.Databaser
 	config   config.Configer
 	Products []entity.Product
+	api      *fiber.App
 }
 
-func NewAPIService(cf config.Configer, cf_path string) (Servicer, error) {
+func NewAPIService(cf config.Configer, cf_path string, api *fiber.App) (Servicer, error) {
 	var database db.Database
 	err := cf.ReadConfig(cf_path)
 	if err != nil {
@@ -42,7 +48,7 @@ func NewAPIService(cf config.Configer, cf_path string) (Servicer, error) {
 		return nil, err
 	}
 
-	return &APIService{config: cf, data: &database}, nil
+	return &APIService{config: cf, data: &database, api: api, Products: []entity.Product{}}, nil
 }
 
 func (ap *APIService) InitFromFile() error {
@@ -94,12 +100,6 @@ func (ap *APIService) Add(c fiber.Ctx) error {
 
 	ap.Products = append(ap.Products, product)
 
-	// err = ap.data.AddProduct(&product)
-	// if err != nil {
-	// 	log.Errorw("Can't add record to database", err)
-	// 	return c.SendStatus(fiber.StatusInternalServerError)
-	// }
-
 	err = ap.WriteToFile()
 	if err != nil {
 		log.Error("Невозможно произвести запись в базу данных", err)
@@ -116,12 +116,6 @@ func (ap *APIService) Remove(c fiber.Ctx) error {
 		return p.Id == gid
 	})
 
-	// err := ap.data.DeleteProduct(gid)
-	// if err != nil {
-	// 	log.Errorw("Can't delete record from database:", err)
-	// 	return c.SendStatus(fiber.StatusInternalServerError)
-	// }
-
 	return c.SendStatus(fiber.StatusAccepted)
 }
 
@@ -132,7 +126,6 @@ func (ap *APIService) Edit(c fiber.Ctx) error {
 	definition := c.FormValue("definition")
 	price_key := c.FormValue("price")
 
-	// product, err := ap.data.GetProductByID(gid)
 	product = func() entity.Product {
 		for _, v := range ap.Products {
 			if v.Id == gid {
@@ -175,7 +168,6 @@ func (ap *APIService) Edit(c fiber.Ctx) error {
 		product.Price = float32(price)
 	}
 
-	// ap.data.UpdateProduct(&product)
 	for _, v := range ap.Products {
 		if v.Id == gid {
 			v = product
@@ -196,22 +188,15 @@ func (ap APIService) Search(c fiber.Ctx) error {
 	var products []entity.Product
 
 	name := c.Query("name")
+	if name == "" {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
 
 	for _, v := range ap.Products {
 		if strings.Contains(strings.ToLower(v.Name), strings.ToLower(name)) {
 			products = append(products, v)
 		}
 	}
-	// products, err := ap.data.SearchProduct(name)
-	// if err != nil {
-	// 	switch err {
-	// 	case gorm.ErrRecordNotFound:
-	// 		return c.SendStatus(fiber.StatusNotFound)
-	// 	default:
-	// 		log.Errorw("Can't retrieve records from database:", err)
-	// 		return c.SendStatus(fiber.StatusInternalServerError)
-	// 	}
-	// }
 
 	if len(products) == 0 {
 		return c.SendStatus(fiber.StatusNotFound)
@@ -222,4 +207,24 @@ func (ap APIService) Search(c fiber.Ctx) error {
 
 func (ap APIService) WriteToFile() error {
 	return ap.data.DropDBAndReinsert(ap.Products)
+}
+
+func (ap *APIService) AddGetController(path string, handler func(c fiber.Ctx) error) {
+	ap.api.Get(path, handler)
+}
+
+func (ap *APIService) AddPostController(path string, handler func(c fiber.Ctx) error) {
+	ap.api.Post(path, handler)
+}
+
+func (ap *APIService) AddPatchController(path string, handler func(c fiber.Ctx) error) {
+	ap.api.Patch(path, handler)
+}
+
+func (ap *APIService) AddDeleteController(path string, handler func(c fiber.Ctx) error) {
+	ap.api.Delete(path, handler)
+}
+
+func (ap *APIService) GetMyApp() *fiber.App {
+	return ap.api
 }
