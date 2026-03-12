@@ -32,26 +32,9 @@ func main() {
 	srvs.AddPostController("/api/add", func(c fiber.Ctx) error {
 		return srvs.Add(c)
 	})
-
-	// POST Add
-	// api.Post("/add", func(c fiber.Ctx) error {
-	// 	return srvs.Add(c)
-	// })
-
-	// DELETE Remove
-	// api.Delete("/remove", func(c fiber.Ctx) error {
-	// 	return srvs.Remove(c)
-	// })
-
-	// PATCH Edit
-	// api.Patch("/edit", func(c fiber.Ctx) error {
-	// 	return srvs.Edit(c)
-	// })
-
-	// GET Search
-	// api.Get("/search", func(c fiber.Ctx) error {
-	// 	return srvs.Search(c)
-	// })
+	srvs.AddGetController("/api/get_all", func(c fiber.Ctx) error {
+		return srvs.GetAllProducts(c)
+	})
 
 	log.Fatal(srvs.GetMyApp().Listen(":1111"))
 }

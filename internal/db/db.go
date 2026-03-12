@@ -14,6 +14,7 @@ type Databaser interface {
 	UpdateProduct(product *entity.Product) error
 	GetProductByID(id string) (entity.Product, error)
 	DropDBAndReinsert(prds []entity.Product) error
+	GetAllProducts() ([]entity.Product, error)
 }
 
 type Database struct {

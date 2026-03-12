@@ -100,3 +100,13 @@ func (d Database) DropDBAndReinsert(prds []entity.Product) error {
 
 	return nil
 }
+
+func (d Database) GetAllProducts() ([]entity.Product, error) {
+	var prds []entity.Product
+	tx := d.connection.Find(&prds)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return prds, nil
+}

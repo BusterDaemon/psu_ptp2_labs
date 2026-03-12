@@ -28,6 +28,7 @@ type Servicer interface {
 	AddPatchController(path string, handler func(c fiber.Ctx) error)
 	AddDeleteController(path string, handler func(c fiber.Ctx) error)
 	GetMyApp() *fiber.App
+	GetAllProducts(c fiber.Ctx) error
 }
 
 type APIService struct {
@@ -227,4 +228,17 @@ func (ap *APIService) AddDeleteController(path string, handler func(c fiber.Ctx)
 
 func (ap *APIService) GetMyApp() *fiber.App {
 	return ap.api
+}
+
+func (ap APIService) GetAllProducts(c fiber.Ctx) error {
+	prds, err := ap.data.GetAllProducts()
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	if len(prds) == 0 {
+		return c.SendStatus(fiber.StatusNotFound)
+	}
+
+	return c.JSON(prds)
 }
