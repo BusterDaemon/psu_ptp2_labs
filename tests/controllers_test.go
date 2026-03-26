@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"product_api/entity"
+	"product_api/internal/db"
 	"product_api/internal/services"
 	"strings"
 	"testing"
@@ -15,7 +16,7 @@ import (
 )
 
 func TestGetAllController(t *testing.T) {
-	app := services.NewServiceSetup()
+	app := services.NewServiceSetup(&db.SQLiteDatabase{})
 
 	req, _ := http.NewRequest("GET", "http://127.0.0.1:1111/api/get_all", nil)
 
@@ -25,7 +26,7 @@ func TestGetAllController(t *testing.T) {
 }
 
 func TestAddController(t *testing.T) {
-	app := services.NewServiceSetup()
+	app := services.NewServiceSetup(&db.SQLiteDatabase{})
 
 	data := url.Values{
 		"name":  {"SVOй Vайбик"},
@@ -42,7 +43,7 @@ func TestAddController(t *testing.T) {
 }
 
 func TestSearchController(t *testing.T) {
-	app := services.NewServiceSetup()
+	app := services.NewServiceSetup(&db.SQLiteDatabase{})
 
 	data := url.Values{
 		"name":  {"SVOй Vайбик"},
@@ -64,7 +65,7 @@ func TestSearchController(t *testing.T) {
 }
 
 func TestEditController(t *testing.T) {
-	app := services.NewServiceSetup()
+	app := services.NewServiceSetup(&db.SQLiteDatabase{})
 
 	data := url.Values{
 		"name":  {"SVOй Vайбик"},
@@ -108,7 +109,7 @@ func TestEditController(t *testing.T) {
 }
 
 func TestDeleteController(t *testing.T) {
-	app := services.NewServiceSetup()
+	app := services.NewServiceSetup(&db.SQLiteDatabase{})
 
 	data := url.Values{
 		"name":  {"SVOй Vайбик"},

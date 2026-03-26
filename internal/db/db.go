@@ -1,6 +1,7 @@
 package db
 
 import (
+	"database/sql"
 	"product_api/entity"
 
 	"gorm.io/gorm"
@@ -19,4 +20,8 @@ type Databaser interface {
 
 type Database struct {
 	connection *gorm.DB
+}
+
+type SQLiteDatabase struct {
+	connection *sql.DB
 }

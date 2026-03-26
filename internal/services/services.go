@@ -38,25 +38,24 @@ type APIService struct {
 	api      *fiber.App
 }
 
-func NewAPIService(cf config.Configer, cf_path string, api *fiber.App) (Servicer, error) {
-	var database db.Database
+func NewAPIService(cf config.Configer, cf_path string, api *fiber.App, dbase db.Databaser) (Servicer, error) {
 	err := cf.ReadConfig(cf_path)
 	if err != nil {
 		return nil, err
 	}
-	err = database.CreateDBConnection(cf.GetDBPath())
+	err = dbase.CreateDBConnection(cf.GetDBPath())
 	if err != nil {
 		return nil, err
 	}
 
-	return &APIService{config: cf, data: &database, api: api, Products: []entity.Product{}}, nil
+	return &APIService{config: cf, data: dbase, api: api, Products: []entity.Product{}}, nil
 }
 
-func NewServiceSetup() *fiber.App {
+func NewServiceSetup(dbase db.Databaser) *fiber.App {
 	var service_cf config.GoodOldConfig
 
 	app := fiber.New()
-	srvs, err := NewAPIService(&service_cf, "appsettings.json", app)
+	srvs, err := NewAPIService(&service_cf, "appsettings.json", app, dbase)
 	if err != nil {
 		log.Fatal(err)
 	}
