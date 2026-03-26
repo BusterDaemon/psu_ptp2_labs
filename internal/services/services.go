@@ -52,6 +52,42 @@ func NewAPIService(cf config.Configer, cf_path string, api *fiber.App) (Servicer
 	return &APIService{config: cf, data: &database, api: api, Products: []entity.Product{}}, nil
 }
 
+func NewServiceSetup() *fiber.App {
+	var service_cf config.GoodOldConfig
+
+	app := fiber.New()
+	srvs, err := NewAPIService(&service_cf, "appsettings.json", app)
+	if err != nil {
+		log.Fatal(err)
+	}
+	srvs.InitFromFile()
+
+	srvs.GetMyApp().Use("/api", func(c fiber.Ctx) error {
+		log.Debugf("API request from %s. URI is: %s", c.Req().IP(), c.Req().RequestCtx().URI().String())
+
+		return c.Next()
+	})
+	srvs.AddGetController("/api/search", func(c fiber.Ctx) error {
+		return srvs.Search(c)
+	})
+	srvs.AddDeleteController("/api/remove", func(c fiber.Ctx) error {
+		return srvs.Remove(c)
+	})
+	srvs.AddPatchController("/api/edit", func(c fiber.Ctx) error {
+		return srvs.Edit(c)
+	})
+	srvs.AddPostController("/api/add", func(c fiber.Ctx) error {
+		return srvs.Add(c)
+	})
+	srvs.AddGetController("/api/get_all", func(c fiber.Ctx) error {
+		return srvs.GetAllProducts(c)
+	})
+
+	// log.Fatal(srvs.GetMyApp().Listen(":1111"))
+
+	return app
+}
+
 func (ap *APIService) InitFromFile() error {
 	f, err := os.ReadFile(ap.config.GetInitFilePath())
 	if err != nil {

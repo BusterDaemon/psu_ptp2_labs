@@ -1,8 +1,12 @@
-FROM go:1.26-alpine3.23-sfw-ent-dev AS build
+FROM alpine:3.23 AS build
 WORKDIR /goida
 COPY . .
 #Запуск на сборку
-#RUN command
+RUN apk add --no-interactive go gcc
+RUN go build -o ./apishka ./cmd/api/main.go
 
 #Контейнер alpine с собранным бинарником из прошлой стадии
-#FROM alpine:3.23 AS main
+FROM alpine:3.23 AS main
+WORKDIR /app
+COPY --from=build apishka ./app
+CMD [ "./app" ]
