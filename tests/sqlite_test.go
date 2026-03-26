@@ -49,8 +49,9 @@ func TestDeleteSqliteProduct(t *testing.T) {
 	err = s.AddProduct(&p)
 	assert.Nil(t, err)
 
-	err = s.DeleteProduct(gid)
+	rws, err := s.DeleteProduct(gid)
 	assert.Nil(t, err)
+	assert.Equal(t, rws, int64(1))
 }
 
 func TestSearchSqliteProduct(t *testing.T) {
@@ -105,8 +106,9 @@ func TestUpdateSqliteProduct(t *testing.T) {
 	p.Name = "ГОЙДА ГОЙДА, РАКЕТЫ ЛЕТЯТ"
 	p.Price = 88.88
 
-	err = s.UpdateProduct(&p)
+	rws, err := s.UpdateProduct(&p)
 	assert.Nil(t, err)
+	assert.Equal(t, rws, int64(1))
 }
 
 func TestGetByIDSqliteProduct(t *testing.T) {

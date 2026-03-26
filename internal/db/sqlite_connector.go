@@ -38,13 +38,19 @@ func (dbase SQLiteDatabase) AddProduct(p *entity.Product) error {
 	return nil
 }
 
-func (dbase SQLiteDatabase) DeleteProduct(id string) error {
-	_, err := dbase.connection.Exec("DELETE FROM PRODUCTS WHERE ID = ?", id)
+func (dbase SQLiteDatabase) DeleteProduct(id string) (int64, error) {
+	var rws int64
+
+	res, err := dbase.connection.Exec("DELETE FROM PRODUCTS WHERE ID = ?", id)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	if rws, err = res.RowsAffected(); err != nil {
+		return -1, err
+	}
+
+	return rws, nil
 }
 
 func (dbase SQLiteDatabase) SearchProduct(name string) ([]entity.Product, error) {
@@ -72,14 +78,19 @@ func (dbase SQLiteDatabase) SearchProduct(name string) ([]entity.Product, error)
 	return products, nil
 }
 
-func (dbase SQLiteDatabase) UpdateProduct(product *entity.Product) error {
-	_, err := dbase.connection.Exec("UPDATE OR ABORT PRODUCTS SET (DEFINITION, NAME, PRICE, IMAGE) = (?, ?, ?, ?) WHERE ID = ?",
+func (dbase SQLiteDatabase) UpdateProduct(product *entity.Product) (int64, error) {
+	res, err := dbase.connection.Exec("UPDATE OR ABORT PRODUCTS SET (DEFINITION, NAME, PRICE, IMAGE) = (?, ?, ?, ?) WHERE ID = ?",
 		product.Definition, product.Name, product.Price, product.Image, product.Id)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	rws, err := res.RowsAffected()
+	if err != nil {
+		return -1, err
+	}
+
+	return rws, nil
 }
 
 func (dbase SQLiteDatabase) GetProductByID(id string) (entity.Product, error) {

@@ -82,8 +82,6 @@ func NewServiceSetup(dbase db.Databaser) *fiber.App {
 		return srvs.GetAllProducts(c)
 	})
 
-	// log.Fatal(srvs.GetMyApp().Listen(":1111"))
-
 	return app
 }
 
@@ -136,9 +134,8 @@ func (ap *APIService) Add(c fiber.Ctx) error {
 
 	ap.Products = append(ap.Products, product)
 
-	err = ap.WriteToFile()
+	err = ap.data.AddProduct(&product)
 	if err != nil {
-		log.Error("Невозможно произвести запись в базу данных", err)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -147,6 +144,14 @@ func (ap *APIService) Add(c fiber.Ctx) error {
 
 func (ap *APIService) Remove(c fiber.Ctx) error {
 	gid := c.FormValue("id")
+
+	rws, err := ap.data.DeleteProduct(gid)
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	if rws == 0 {
+		return c.SendStatus(fiber.StatusNotFound)
+	}
 
 	ap.Products = slices.DeleteFunc(ap.Products, func(p entity.Product) bool {
 		return p.Id == gid
@@ -204,24 +209,23 @@ func (ap *APIService) Edit(c fiber.Ctx) error {
 		product.Price = float32(price)
 	}
 
-	for _, v := range ap.Products {
-		if v.Id == gid {
-			v = product
-			break
-		}
-	}
-
-	err = ap.WriteToFile()
+	rws, err := ap.data.UpdateProduct(&product)
 	if err != nil {
-		log.Error("Невозможно произвести запись в базу данных", err)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
+	if rws == 0 {
+		return c.SendStatus(fiber.StatusNotFound)
+	}
+	ap.Products, _ = ap.data.GetAllProducts()
 
 	return c.SendStatus(fiber.StatusAccepted)
 }
 
 func (ap APIService) Search(c fiber.Ctx) error {
-	var products []entity.Product
+	var (
+		products []entity.Product
+		err      error
+	)
 
 	name := c.Query("name")
 	if name == "" {
@@ -235,9 +239,16 @@ func (ap APIService) Search(c fiber.Ctx) error {
 	}
 
 	if len(products) == 0 {
-		return c.SendStatus(fiber.StatusNotFound)
+		products, err = ap.data.SearchProduct(name)
+		if err != nil {
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+		if len(products) == 0 {
+			return c.SendStatus(fiber.StatusNotFound)
+		}
 	}
 
+	ap.Products = append(ap.Products, products...)
 	return c.JSON(products)
 }
 

@@ -10,9 +10,9 @@ import (
 type Databaser interface {
 	CreateDBConnection(db_path string) error
 	AddProduct(product *entity.Product) error
-	DeleteProduct(id string) error
+	DeleteProduct(id string) (int64, error)
 	SearchProduct(name string) ([]entity.Product, error)
-	UpdateProduct(product *entity.Product) error
+	UpdateProduct(product *entity.Product) (int64, error)
 	GetProductByID(id string) (entity.Product, error)
 	DropDBAndReinsert(prds []entity.Product) error
 	GetAllProducts() ([]entity.Product, error)

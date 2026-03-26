@@ -31,13 +31,13 @@ func (d Database) AddProduct(product *entity.Product) error {
 	return nil
 }
 
-func (d Database) DeleteProduct(id string) error {
+func (d Database) DeleteProduct(id string) (int64, error) {
 	tx := d.connection.Delete(&entity.Product{Id: id})
 	if tx.Error != nil {
-		return tx.Error
+		return 0, tx.Error
 	}
 
-	return nil
+	return tx.RowsAffected, nil
 }
 
 func (d Database) SearchProduct(name string) ([]entity.Product, error) {
@@ -56,18 +56,18 @@ func (d Database) SearchProduct(name string) ([]entity.Product, error) {
 	return products, nil
 }
 
-func (d Database) UpdateProduct(product *entity.Product) error {
+func (d Database) UpdateProduct(product *entity.Product) (int64, error) {
 	tx := d.connection.Save(product)
 	if tx.Error != nil {
 		switch tx.Error {
 		case gorm.ErrRecordNotFound:
-			return nil
+			return 0, nil
 		default:
-			return tx.Error
+			return 0, tx.Error
 		}
 	}
 
-	return nil
+	return tx.RowsAffected, nil
 }
 
 func (d Database) GetProductByID(id string) (entity.Product, error) {
