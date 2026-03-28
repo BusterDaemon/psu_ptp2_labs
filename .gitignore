@@ -1,3 +1,4 @@
 *.db
 appsettings.json
 init_prds.json
+*.exe

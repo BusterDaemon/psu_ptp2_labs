@@ -21,7 +21,8 @@ func (dbase *SQLiteDatabase) CreateDBConnection(path string) error {
 	NAME TEXT NOT NULL ON CONFLICT ABORT,
 	PRICE REAL DEFAULT 0.0,
 	IMAGE TEXT
-);`)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS IDENT ON PRODUCTS (ID);`)
 	if err != nil {
 		return err
 	}
