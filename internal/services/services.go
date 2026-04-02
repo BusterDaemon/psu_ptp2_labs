@@ -152,7 +152,7 @@ func (ap *APIService) Add(c fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return c.SendStatus(fiber.StatusAccepted)
+	return c.JSON(product)
 }
 
 func (ap *APIService) Remove(c fiber.Ctx) error {
@@ -231,7 +231,7 @@ func (ap *APIService) Edit(c fiber.Ctx) error {
 	}
 	ap.Products, _ = ap.data.GetAllProducts()
 
-	return c.SendStatus(fiber.StatusAccepted)
+	return c.JSON(product)
 }
 
 func (ap APIService) Search(c fiber.Ctx) error {
