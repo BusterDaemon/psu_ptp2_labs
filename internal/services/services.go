@@ -13,6 +13,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/sdrapkin/guid"
 )
 
@@ -29,6 +30,7 @@ type Servicer interface {
 	AddDeleteController(path string, handler func(c fiber.Ctx) error)
 	GetMyApp() *fiber.App
 	GetAllProducts(c fiber.Ctx) error
+	InfoByID(c fiber.Ctx) error
 }
 
 type APIService struct {
@@ -60,6 +62,14 @@ func NewServiceSetup(dbase db.Databaser) *fiber.App {
 		log.Fatal(err)
 	}
 	srvs.InitFromFile()
+	srvs.GetMyApp().Use(cors.New(
+		cors.Config{
+			AllowOrigins:        []string{"*"},
+			AllowHeaders:        []string{"Origin", "Content-Type", "Accept"},
+			AllowMethods:        []string{"GET", "POST", "DELETE", "PATCH"},
+			AllowPrivateNetwork: true,
+		},
+	))
 
 	srvs.GetMyApp().Use("/api", func(c fiber.Ctx) error {
 		log.Debugf("API request from %s. URI is: %s", c.Req().IP(), c.Req().RequestCtx().URI().String())
@@ -80,6 +90,9 @@ func NewServiceSetup(dbase db.Databaser) *fiber.App {
 	})
 	srvs.AddGetController("/api/get_all", func(c fiber.Ctx) error {
 		return srvs.GetAllProducts(c)
+	})
+	srvs.AddGetController("/api/get_id", func(c fiber.Ctx) error {
+		return srvs.InfoByID(c)
 	})
 
 	return app
@@ -250,6 +263,23 @@ func (ap APIService) Search(c fiber.Ctx) error {
 
 	ap.Products = append(ap.Products, products...)
 	return c.JSON(products)
+}
+
+func (ap APIService) InfoByID(c fiber.Ctx) error {
+	var (
+		prd entity.Product
+		err error
+	)
+	id := c.Query("id")
+	if id == "" {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+
+	if prd, err = ap.data.GetProductByID(id); err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return c.JSON(prd)
 }
 
 func (ap APIService) WriteToFile() error {
