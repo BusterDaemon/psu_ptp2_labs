@@ -10,16 +10,6 @@ type GoodOldConfig struct {
 	initFilePath string
 }
 
-func NewGoodOldConfig(cf_path string) (Configer, error) {
-	var cf GoodOldConfig
-	err := cf.ReadConfig(cf_path)
-	if err != nil {
-		return nil, err
-	}
-
-	return &cf, nil
-}
-
 func (conf *GoodOldConfig) ReadConfig(path string) error {
 	type config struct {
 		DataBaseFilePath string `json:"DataBaseFilePath"`
