@@ -24,10 +24,6 @@ type Servicer interface {
 	Search(c fiber.Ctx) error
 	InitFromFile() error
 	WriteToFile() error
-	AddGetController(path string, handler func(c fiber.Ctx) error)
-	AddPostController(path string, handler func(c fiber.Ctx) error)
-	AddPatchController(path string, handler func(c fiber.Ctx) error)
-	AddDeleteController(path string, handler func(c fiber.Ctx) error)
 	GetMyApp() *fiber.App
 	GetAllProducts(c fiber.Ctx) error
 	InfoByID(c fiber.Ctx) error
@@ -76,24 +72,15 @@ func NewServiceSetup(dbase db.Databaser) *fiber.App {
 
 		return c.Next()
 	})
-	srvs.AddGetController("/api/search", func(c fiber.Ctx) error {
-		return srvs.Search(c)
-	})
-	srvs.AddDeleteController("/api/remove", func(c fiber.Ctx) error {
-		return srvs.Remove(c)
-	})
-	srvs.AddPatchController("/api/edit", func(c fiber.Ctx) error {
-		return srvs.Edit(c)
-	})
-	srvs.AddPostController("/api/add", func(c fiber.Ctx) error {
-		return srvs.Add(c)
-	})
-	srvs.AddGetController("/api/get_all", func(c fiber.Ctx) error {
-		return srvs.GetAllProducts(c)
-	})
-	srvs.AddGetController("/api/get_id", func(c fiber.Ctx) error {
-		return srvs.InfoByID(c)
-	})
+
+	apiGroup := srvs.GetMyApp().Group("/api")
+
+	apiGroup.Get("/search", srvs.Search)
+	apiGroup.Get("/get_all", srvs.GetAllProducts)
+	apiGroup.Get("/get_id", srvs.InfoByID)
+	apiGroup.Post("/add", srvs.Add)
+	apiGroup.Patch("/edit", srvs.Edit)
+	apiGroup.Delete("/remove", srvs.Remove)
 
 	return app
 }
