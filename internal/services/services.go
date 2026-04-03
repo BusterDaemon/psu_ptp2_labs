@@ -273,22 +273,6 @@ func (ap APIService) WriteToFile() error {
 	return ap.data.DropDBAndReinsert(ap.Products)
 }
 
-func (ap *APIService) AddGetController(path string, handler func(c fiber.Ctx) error) {
-	ap.api.Get(path, handler)
-}
-
-func (ap *APIService) AddPostController(path string, handler func(c fiber.Ctx) error) {
-	ap.api.Post(path, handler)
-}
-
-func (ap *APIService) AddPatchController(path string, handler func(c fiber.Ctx) error) {
-	ap.api.Patch(path, handler)
-}
-
-func (ap *APIService) AddDeleteController(path string, handler func(c fiber.Ctx) error) {
-	ap.api.Delete(path, handler)
-}
-
 func (ap *APIService) GetMyApp() *fiber.App {
 	return ap.api
 }
